@@ -3,154 +3,159 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Rishish Mishra | Profile</title>
+<title>Rishish Mishra</title>
 
 <style>
-:root {
-  --primary: #1e3c72;
-  --secondary: #2a5298;
-  --light-bg: #f4f6f8;
-  --card-bg: #ffffff;
-  --text-dark: #333;
-}
+/* ---------- RESET & BASE ---------- */
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
-  font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  background: var(--light-bg);
-  color: var(--text-dark);
-  line-height: 1.6;
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+  color: #111;
+  background: #ffffff;
+  line-height: 1.7;
 }
 
-/* ---------- HEADER ---------- */
-
-header {
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
-  color: white;
-  padding: 70px 20px 60px;
-  text-align: center;
+/* ---------- HERO ---------- */
+.hero {
+  min-height: 90vh;
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  align-items: center;
+  padding: 80px;
+  gap: 80px;
 }
 
-header img {
-  width: 165px;
-  height: 165px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 4px solid rgba(255,255,255,0.9);
-  margin-bottom: 18px;
-}
-
-header h1 {
-  margin: 0;
-  font-size: 2.6rem;
+.hero-text h1 {
+  font-size: 3.2rem;
   font-weight: 600;
+  margin: 0 0 15px;
 }
 
-header p {
-  margin-top: 10px;
-  font-size: 1.15rem;
-  opacity: 0.95;
+.hero-text p {
+  font-size: 1.2rem;
+  color: #444;
+  max-width: 520px;
 }
 
-/* ---------- LAYOUT ---------- */
+.hero-meta {
+  margin-top: 30px;
+  font-size: 0.95rem;
+  color: #666;
+}
 
+.hero img {
+  width: 100%;
+  max-width: 360px;
+  border-radius: 6px;
+  justify-self: end;
+}
+
+/* ---------- SECTION ---------- */
 section {
-  max-width: 960px;
-  margin: 50px auto;
-  padding: 0 20px;
+  max-width: 1100px;
+  margin: 120px auto;
+  padding: 0 80px;
 }
 
-.card {
-  background: var(--card-bg);
-  padding: 30px 32px;
-  margin-bottom: 30px;
-  border-radius: 14px;
-  box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+.section-title {
+  font-size: 2rem;
+  font-weight: 500;
+  margin-bottom: 40px;
 }
 
-h2 {
-  margin-top: 0;
+/* ---------- ABOUT ---------- */
+.about {
+  max-width: 720px;
+  font-size: 1.05rem;
+  color: #333;
+}
+
+/* ---------- INTERESTS ---------- */
+.interests {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 30px;
+}
+
+.interest {
+  border-top: 2px solid #eee;
+  padding-top: 15px;
+  font-size: 0.95rem;
+}
+
+/* ---------- PUBLICATIONS ---------- */
+.pub {
   margin-bottom: 18px;
-  color: var(--primary);
-  font-weight: 600;
 }
 
-/* ---------- LISTS ---------- */
-
-ul {
-  padding-left: 20px;
-}
-
-ol li {
-  margin-bottom: 10px;
-}
-
-a {
-  color: var(--secondary);
+.pub a {
+  color: #000;
   text-decoration: none;
+  border-bottom: 1px solid #ccc;
 }
 
-a:hover {
-  text-decoration: underline;
+.pub a:hover {
+  border-color: #000;
 }
 
 /* ---------- FIGURES ---------- */
-
-.figure-block {
-  margin-top: 25px;
+.figures {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 50px;
+  align-items: start;
 }
 
-.figure-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 30px;
-  margin-bottom: 35px;
-}
-
-.figure-row figure,
-.figure-center figure {
-  margin: 0;
-  text-align: center;
-}
-
-figure img {
+.figures img {
   width: 100%;
-  border-radius: 10px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  border-radius: 4px;
 }
 
-.figure-row figure {
-  flex: 1;
-}
-
-.figure-center img {
-  max-width: 720px;
-}
-
-figcaption {
-  margin-top: 10px;
+.figure-caption {
   font-size: 0.9rem;
   color: #555;
+  margin-top: 10px;
+}
+
+.figure-wide {
+  grid-column: span 2;
+}
+
+/* ---------- CONTACT ---------- */
+.contact {
+  font-size: 1rem;
+}
+
+.contact a {
+  color: #000;
+  text-decoration: none;
+  border-bottom: 1px solid #bbb;
 }
 
 /* ---------- FOOTER ---------- */
-
 footer {
-  text-align: center;
-  padding: 22px;
-  background: #1f1f1f;
-  color: #bbb;
-  font-size: 0.9rem;
+  padding: 60px 80px;
+  font-size: 0.85rem;
+  color: #777;
 }
 
 /* ---------- MOBILE ---------- */
-
-@media (max-width: 768px) {
-  .figure-row {
-    flex-direction: column;
+@media (max-width: 900px) {
+  .hero {
+    grid-template-columns: 1fr;
+    padding: 60px 30px;
+    gap: 40px;
   }
-  header h1 {
-    font-size: 2.2rem;
+  section {
+    padding: 0 30px;
+  }
+  .figures {
+    grid-template-columns: 1fr;
+  }
+  .figure-wide {
+    grid-column: span 1;
   }
 }
 </style>
@@ -158,90 +163,107 @@ footer {
 
 <body>
 
-<header>
-  <img src="profile.jpg" alt="Rishish Mishra">
-  <h1>Rishish Mishra</h1>
-  <p>PhD Researcher · Microswimmers · Fluid Dynamics</p>
-</header>
-
-<section>
-
-<div class="card">
-  <h2>About Me</h2>
-  <p>
-    I am a PhD scholar in Thermal Engineering at IIT Jammu. My research focuses on the
-    hydrodynamics of microswimmers, their interaction with fluid–fluid interfaces,
-    and computational modeling using the squirmer framework.
-  </p>
-</div>
-
-<div class="card">
-  <h2>Research Interests</h2>
-  <ul>
-    <li>Low Reynolds number flows</li>
-    <li>Fluid dynamics</li>
-    <li>Microswimmers and active matter</li>
-    <li>Fluid–fluid interface interactions</li>
-    <li>Squirmer model simulations</li>
-  </ul>
-</div>
-
-<div class="card">
-  <h2>Publications</h2>
-  <ol>
-    <li><a href="https://journals.aps.org/prfluids/abstract/10.1103/vrqb-nf6x" target="_blank">
-      Interface crossing behavior of prolate microswimmers: Thermo and hydrodynamics</a></li>
-    <li><a href="https://iopscience.iop.org/article/10.1088/1873-7005/ad6804/meta" target="_blank">
-      Flow structure around a microswimmer at fluid–fluid interface</a></li>
-    <li><a href="https://journals.sagepub.com/doi/full/10.1177/09544089221125633" target="_blank">
-      Conjugate heat transfer in single-point cutting tools</a></li>
-    <li><a href="https://www.sciencedirect.com/science/article/pii/S2214785321004880" target="_blank">
-      Soilless engineered soil for sustainable green roofs</a></li>
-  </ol>
-</div>
-
-<div class="card">
-  <h2>Selected Figures</h2>
-
-  <div class="figure-block">
-
-    <div class="figure-row">
-      <figure>
-        <img src="Pus_bulk.PNG" alt="Push bulk">
-        <figcaption>Hydrodynamic forcing configuration</figcaption>
-      </figure>
-
-      <figure>
-        <img src="1.png" alt="Velocity orientation">
-        <figcaption>Velocity–orientation schematic</figcaption>
-      </figure>
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-text">
+    <h1>Rishish Mishra</h1>
+    <p>
+      PhD researcher in fluid mechanics working on microswimmers,
+      low-Reynolds hydrodynamics, and fluid–fluid interface interactions.
+    </p>
+    <div class="hero-meta">
+      Thermal Engineering · IIT Jammu
     </div>
-
-    <div class="figure-center">
-      <figure>
-        <img src="Snapshots.png" alt="Snapshots">
-        <figcaption>Representative simulation snapshots</figcaption>
-      </figure>
-    </div>
-
   </div>
+
+  <img src="profile.jpg" alt="Rishish Mishra">
 </div>
 
-<div class="card">
-  <h2>Contact</h2>
-  <p>
-    Email: <a href="mailto:rishish3mishra@gmail.com">rishish3mishra@gmail.com</a><br>
+<!-- ABOUT -->
+<section>
+  <div class="section-title">About</div>
+  <div class="about">
+    I am a PhD scholar in Thermal Engineering at IIT Jammu. My research explores the
+    thermodynamic and hydrodynamic mechanisms governing microswimmer motion near
+    fluid–fluid interfaces, with emphasis on interface crossing, trapping,
+    and flow-structure interactions using continuum and squirmer-based models.
+  </div>
+</section>
+
+<!-- INTERESTS -->
+<section>
+  <div class="section-title">Research Focus</div>
+  <div class="interests">
+    <div class="interest">Low Reynolds number hydrodynamics</div>
+    <div class="interest">Microswimmers & active matter</div>
+    <div class="interest">Fluid–fluid interfaces</div>
+    <div class="interest">Squirmer models & simulations</div>
+  </div>
+</section>
+
+<!-- PUBLICATIONS -->
+<section>
+  <div class="section-title">Selected Publications</div>
+
+  <div class="pub">
+    <a href="https://journals.aps.org/prfluids/abstract/10.1103/vrqb-nf6x" target="_blank">
+      Interface crossing behavior of prolate microswimmers: Thermo and hydrodynamics
+    </a>
+  </div>
+
+  <div class="pub">
+    <a href="https://iopscience.iop.org/article/10.1088/1873-7005/ad6804/meta" target="_blank">
+      Flow structure around a microswimmer at fluid–fluid interface
+    </a>
+  </div>
+
+  <div class="pub">
+    <a href="https://journals.sagepub.com/doi/full/10.1177/09544089221125633" target="_blank">
+      Conjugate heat transfer in single-point cutting tools
+    </a>
+  </div>
+
+  <div class="pub">
+    <a href="https://www.sciencedirect.com/science/article/pii/S2214785321004880" target="_blank">
+      Soilless engineered soil for sustainable green roofs
+    </a>
+  </div>
+</section>
+
+<!-- FIGURES -->
+<section>
+  <div class="section-title">Research Visuals</div>
+
+  <div class="figures">
+    <div>
+      <img src="Pus_bulk.PNG">
+      <div class="figure-caption">Hydrodynamic forcing configuration</div>
+    </div>
+
+    <div>
+      <img src="1.png">
+      <div class="figure-caption">Velocity–orientation coupling</div>
+    </div>
+
+    <div class="figure-wide">
+      <img src="Snapshots.png">
+      <div class="figure-caption">Representative simulation snapshots</div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section>
+  <div class="section-title">Contact</div>
+  <div class="contact">
+    <a href="mailto:rishish3mishra@gmail.com">rishish3mishra@gmail.com</a><br>
     Google Scholar · ResearchGate · LinkedIn
-  </p>
-</div>
-
+  </div>
 </section>
 
 <footer>
-  © 2026 Rishish Mishra. All rights reserved.
+  © 2026 Rishish Mishra
 </footer>
 
 </body>
 </html>
-
-
