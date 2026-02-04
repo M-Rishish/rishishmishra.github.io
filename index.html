@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Rishish Mishra | Profile</title>
+
   <style>
     body {
       margin: 0;
@@ -11,25 +12,39 @@
       background: #f4f6f8;
       color: #333;
     }
+
     header {
       background: linear-gradient(135deg, #1e3c72, #2a5298);
       color: white;
       padding: 60px 20px;
       text-align: center;
     }
+
+    header img {
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid white;
+      margin-bottom: 15px;
+    }
+
     header h1 {
       margin: 0;
       font-size: 2.5rem;
     }
+
     header p {
       font-size: 1.1rem;
       margin-top: 10px;
     }
+
     section {
       max-width: 900px;
       margin: 40px auto;
       padding: 0 20px;
     }
+
     .card {
       background: white;
       padding: 25px;
@@ -37,13 +52,58 @@
       border-radius: 10px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.08);
     }
+
     h2 {
       color: #1e3c72;
       margin-top: 0;
     }
+
     ul {
       padding-left: 20px;
     }
+
+    a {
+      color: #2a5298;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    /* -------- FIGURE STYLES -------- */
+
+    .figure-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 40px;
+      margin-top: 30px;
+      flex-wrap: wrap;
+    }
+
+    .figure-row img {
+      width: 40%;
+      max-width: 400px;
+      height: auto;
+      border-radius: 6px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+
+    .figure-center {
+      display: flex;
+      justify-content: center;
+      margin-top: 40px;
+    }
+
+    .figure-center img {
+      width: 70%;
+      max-width: 700px;
+      height: auto;
+      border-radius: 6px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+
     footer {
       text-align: center;
       padding: 20px;
@@ -51,28 +111,32 @@
       color: #bbb;
       font-size: 0.9rem;
     }
-    a {
-      color: #2a5298;
-      text-decoration: none;
-    }
-    a:hover {
-      text-decoration: underline;
+
+    @media (max-width: 768px) {
+      .figure-row img {
+        width: 90%;
+      }
+      .figure-center img {
+        width: 95%;
+      }
     }
   </style>
 </head>
+
 <body>
 
   <header>
-    <img src="profile.jpg" alt="Rishish Mishra" style="width:160px;height:160px;border-radius:50%;object-fit:cover;border:4px solid white;margin-bottom:15px;" />
+    <img src="profile.jpg" alt="Rishish Mishra">
     <h1>Rishish Mishra</h1>
     <p>PhD Researcher | Microswimmers | Fluid Dynamics</p>
   </header>
 
   <section>
+
     <div class="card">
       <h2>About Me</h2>
       <p>
-        I am a PhD scholar in Thermal Engineering Deparment at IIT Jammu. My research focuses on the
+        I am a PhD scholar in Thermal Engineering at IIT Jammu. My research focuses on the
         hydrodynamics of microswimmers, their interaction with fluid–fluid interfaces, and
         computational modeling using the squirmer framework.
       </p>
@@ -81,7 +145,7 @@
     <div class="card">
       <h2>Research Interests</h2>
       <ul>
-        <li>Low Reynolds number flow</li>
+        <li>Low Reynolds number flows</li>
         <li>Fluid dynamics</li>
         <li>Microswimmers and active matter</li>
         <li>Fluid–fluid interface interactions</li>
@@ -116,12 +180,26 @@
     </div>
 
     <div class="card">
+      <h2>Figures</h2>
+
+      <div class="figure-row">
+        <img src="Push_bul.png" alt="Push bullet figure">
+        <img src="Schematic_vel_orientation.png" alt="Velocity orientation schematic">
+      </div>
+
+      <div class="figure-center">
+        <img src="Figure2.png" alt="Figure 2">
+      </div>
+    </div>
+
+    <div class="card">
       <h2>Contact</h2>
       <p>
-        Email: <a href="mailto:rishish3mishra@gmail.com">rishish3mishra@gmail.com</a><br />
+        Email: <a href="mailto:rishish3mishra@gmail.com">rishish3mishra@gmail.com</a><br>
         Google Scholar | ResearchGate | LinkedIn
       </p>
     </div>
+
   </section>
 
   <footer>
@@ -130,3 +208,4 @@
 
 </body>
 </html>
+
