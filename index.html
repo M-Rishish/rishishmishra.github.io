@@ -6,94 +6,88 @@
 <title>Rishish Mishra</title>
 
 <style>
-/* ---------- RESET & BASE ---------- */
 * { box-sizing: border-box; }
 
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
-  color: #111;
   background: #ffffff;
+  color: #111;
   line-height: 1.7;
 }
 
 /* ---------- HERO ---------- */
 .hero {
-  min-height: 90vh;
   display: grid;
-  grid-template-columns: 1.2fr 1fr;
-  align-items: center;
-  padding: 80px;
-  gap: 80px;
+  grid-template-columns: 1fr 1fr;
+  min-height: 100vh;
+}
+
+.hero-text {
+  padding: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .hero-text h1 {
-  font-size: 3.2rem;
+  font-size: 3.5rem;
   font-weight: 600;
-  margin: 0 0 15px;
+  margin-bottom: 20px;
 }
 
 .hero-text p {
-  font-size: 1.2rem;
+  font-size: 1.3rem;
+  max-width: 650px;
   color: #444;
-  max-width: 520px;
 }
 
 .hero-meta {
   margin-top: 30px;
-  font-size: 0.95rem;
+  font-size: 1.05rem;
   color: #666;
 }
 
-.hero img {
-  width: 100%;
-  max-width: 360px;
-  border-radius: 6px;
-  justify-self: end;
+.hero-image {
+  background: linear-gradient(135deg, #1e3c72, #2a5298);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* ---------- SECTION ---------- */
-section {
-  max-width: 1100px;
-  margin: 120px auto;
-  padding: 0 80px;
+.hero-image img {
+  width: 300px;
+  border-radius: 6px;
+}
+
+/* ---------- FULL WIDTH SECTIONS ---------- */
+.section {
+  padding: 140px 120px;
 }
 
 .section-title {
-  font-size: 2rem;
-  font-weight: 500;
-  margin-bottom: 40px;
+  font-size: 2.4rem;
+  margin-bottom: 45px;
+  letter-spacing: 0.02em;
 }
 
 /* ---------- ABOUT ---------- */
-.about {
-  max-width: 720px;
-  font-size: 1.05rem;
+.about-text {
+  font-size: 1.25rem;
+  max-width: 900px;
   color: #333;
-}
-
-/* ---------- INTERESTS ---------- */
-.interests {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 30px;
-}
-
-.interest {
-  border-top: 2px solid #eee;
-  padding-top: 15px;
-  font-size: 0.95rem;
 }
 
 /* ---------- PUBLICATIONS ---------- */
 .pub {
-  margin-bottom: 18px;
+  font-size: 1.15rem;
+  margin-bottom: 22px;
 }
 
 .pub a {
-  color: #000;
   text-decoration: none;
-  border-bottom: 1px solid #ccc;
+  color: #000;
+  border-bottom: 1px solid #bbb;
 }
 
 .pub a:hover {
@@ -101,60 +95,42 @@ section {
 }
 
 /* ---------- FIGURES ---------- */
-.figures {
+.visuals {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 50px;
-  align-items: start;
+  gap: 40px;
 }
 
-.figures img {
-  width: 100%;
-  border-radius: 4px;
+.visuals img {
+  width: 90%;
+  border-radius: 6px;
 }
 
-.figure-caption {
-  font-size: 0.9rem;
-  color: #555;
-  margin-top: 10px;
-}
-
-.figure-wide {
+.visual-wide {
   grid-column: span 2;
 }
 
 /* ---------- CONTACT ---------- */
 .contact {
-  font-size: 1rem;
-}
-
-.contact a {
-  color: #000;
-  text-decoration: none;
-  border-bottom: 1px solid #bbb;
+  font-size: 1.1rem;
 }
 
 /* ---------- FOOTER ---------- */
 footer {
-  padding: 60px 80px;
-  font-size: 0.85rem;
+  padding: 80px 120px;
+  font-size: 0.9rem;
   color: #777;
 }
 
 /* ---------- MOBILE ---------- */
-@media (max-width: 900px) {
-  .hero {
+@media (max-width: 1000px) {
+  .hero, .visuals {
     grid-template-columns: 1fr;
+  }
+  .hero-text, .section, footer {
     padding: 60px 30px;
-    gap: 40px;
   }
-  section {
-    padding: 0 30px;
-  }
-  .figures {
-    grid-template-columns: 1fr;
-  }
-  .figure-wide {
+  .visual-wide {
     grid-column: span 1;
   }
 }
@@ -169,40 +145,32 @@ footer {
     <h1>Rishish Mishra</h1>
     <p>
       PhD researcher in fluid mechanics working on microswimmers,
-      low-Reynolds hydrodynamics, and fluid–fluid interface interactions.
+      low-Reynolds-number hydrodynamics, and fluid–fluid interface interactions.
     </p>
     <div class="hero-meta">
       Thermal Engineering · IIT Jammu
     </div>
   </div>
 
-  <img src="profile.jpg" alt="Rishish Mishra">
+  <div class="hero-image">
+    <img src="profile.jpg" alt="Rishish Mishra">
+  </div>
 </div>
 
 <!-- ABOUT -->
-<section>
+<div class="section">
   <div class="section-title">About</div>
-  <div class="about">
-    I am a PhD scholar in Thermal Engineering at IIT Jammu. My research explores the
-    thermodynamic and hydrodynamic mechanisms governing microswimmer motion near
-    fluid–fluid interfaces, with emphasis on interface crossing, trapping,
-    and flow-structure interactions using continuum and squirmer-based models.
+  <div class="about-text">
+    I am a PhD scholar in Thermal Engineering at IIT Jammu. My research focuses on
+    the thermodynamic and hydrodynamic mechanisms governing microswimmer motion
+    near fluid–fluid interfaces. Using continuum modeling and squirmer-based
+    simulations, I investigate interface crossing, trapping, and flow–structure
+    interactions in low-Reynolds-number flows.
   </div>
-</section>
-
-<!-- INTERESTS -->
-<section>
-  <div class="section-title">Research Focus</div>
-  <div class="interests">
-    <div class="interest">Low Reynolds number hydrodynamics</div>
-    <div class="interest">Microswimmers & active matter</div>
-    <div class="interest">Fluid–fluid interfaces</div>
-    <div class="interest">Squirmer models & simulations</div>
-  </div>
-</section>
+</div>
 
 <!-- PUBLICATIONS -->
-<section>
+<div class="section">
   <div class="section-title">Selected Publications</div>
 
   <div class="pub">
@@ -225,41 +193,30 @@ footer {
 
   <div class="pub">
     <a href="https://www.sciencedirect.com/science/article/pii/S2214785321004880" target="_blank">
-      Soilless engineered soil for sustainable green roofs
+      Sustainable engineered soil for green roof applications
     </a>
   </div>
-</section>
+</div>
 
 <!-- FIGURES -->
-<section>
+<div class="section">
   <div class="section-title">Research Visuals</div>
 
-  <div class="figures">
-    <div>
-      <img src="Pus_bulk.PNG">
-      <div class="figure-caption">Hydrodynamic forcing configuration</div>
-    </div>
-
-    <div>
-      <img src="1.png">
-      <div class="figure-caption">Velocity–orientation coupling</div>
-    </div>
-
-    <div class="figure-wide">
-      <img src="Snapshots.png">
-      <div class="figure-caption">Representative simulation snapshots</div>
-    </div>
+  <div class="visuals">
+    <img src="Pus_bulk.PNG" alt="Hydrodynamic forcing">
+    <img src="1.png" alt="Velocity orientation">
+    <img src="Snapshots.png" class="visual-wide" alt="Simulation snapshots">
   </div>
-</section>
+</div>
 
 <!-- CONTACT -->
-<section>
+<div class="section">
   <div class="section-title">Contact</div>
   <div class="contact">
-    <a href="mailto:rishish3mishra@gmail.com">rishish3mishra@gmail.com</a><br>
+    rishish3mishra@gmail.com<br>
     Google Scholar · ResearchGate · LinkedIn
   </div>
-</section>
+</div>
 
 <footer>
   © 2026 Rishish Mishra
@@ -267,3 +224,4 @@ footer {
 
 </body>
 </html>
+
