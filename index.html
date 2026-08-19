@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rishish Mishra — Microswimmers at fluid–fluid interfaces</title>
+<meta name="description" content="Rishish Mishra, PhD (IIT Jammu). Lattice Boltzmann simulations of microswimmers crossing, trapping and bouncing at fluid–fluid interfaces.">
+<meta property="og:title" content="Rishish Mishra">
+<meta property="og:description" content="Low-Reynolds-number hydrodynamics of microswimmers near fluid–fluid interfaces.">
+<meta property="og:type" content="profile">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..120,400..700&family=IBM+Plex+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   TOKENS
+   Two fluids, one interface. The palette is the physics:
+   ink = lower phase, phase = upper phase,
+   sea = the interface itself, amber = the swimmer.
+   ============================================================ */
+:root{
+  --ink:      #0A1C24;
+  --ink-soft: #123039;
+  --phase:    #EEF2F2;
+  --paper:    #FFFFFF;
+  --slate:    #52686F;
+  --sea:      #2E9AA8;   /* interface / structure */
+  --amber:    #E0A03A;   /* swimmer / anything active */
+  --hair:     rgba(10,28,36,.14);
+  --hair-ink: rgba(238,242,242,.16);
+
+  --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --body:    "Newsreader", Georgia, "Times New Roman", serif;
+  --mono:    "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --pad: clamp(24px, 6vw, 120px);
+  --maxw: 1240px;
+}
+
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  background:var(--phase);
+  color:var(--ink);
+  font-family:var(--body);
+  font-size:clamp(17px,1.05vw,19px);
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit;}
+img{max-width:100%;display:block;}
+
+:focus-visible{
+  outline:2px solid var(--amber);
+  outline-offset:3px;
+  border-radius:2px;
+}
+
+.eyebrow{
+  font-family:var(--mono);
+  font-size:.72rem;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:var(--sea);
+  margin:0 0 22px;
+}
+.wrap{max-width:var(--maxw);margin:0 auto;}
+
+/* ============================================================
+   NAV
+   ============================================================ */
+.nav{
+  position:sticky;top:0;z-index:50;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:20px;
+  padding:14px var(--pad);
+  font-family:var(--mono);
+  font-size:.78rem;
+  letter-spacing:.06em;
+  background:rgba(238,242,242,.82);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid transparent;
+  transition:border-color .3s ease, background .3s ease;
+}
+.nav.is-stuck{border-bottom-color:var(--hair);}
+.nav__mark{font-weight:500;letter-spacing:.14em;}
+.nav__mark span{color:var(--sea);}
+.nav__links{display:flex;gap:22px;flex-wrap:wrap;}
+.nav__links a{text-decoration:none;color:var(--slate);transition:color .2s;}
+.nav__links a:hover{color:var(--ink);}
+
+/* ============================================================
+   HERO — the signature.
+   A live interface: the swimmer approaches from the lower phase
+   and the boundary decides what happens to it.
+   ============================================================ */
+.hero{
+  position:relative;
+  min-height:calc(100svh - 52px);
+  display:grid;
+  grid-template-rows:1fr auto;
+  overflow:hidden;
+}
+#field{position:absolute;inset:0;width:100%;height:100%;}
+.hero__top,.hero__bottom{position:relative;z-index:2;padding:0 var(--pad);}
+.hero__top{
+  align-self:center;
+  padding-top:clamp(40px,8vh,90px);
+  padding-bottom:clamp(120px,22vh,220px);
+}
+.hero__inner{max-width:var(--maxw);margin:0 auto;width:100%;}
+
+.hero h1{
+  font-family:var(--display);
+  font-variation-settings:"wdth" 112;
+  font-weight:600;
+  font-size:clamp(2.9rem,8.6vw,7.4rem);
+  line-height:.94;
+  letter-spacing:-.025em;
+  margin:0 0 26px;
+}
+.hero h1 em{
+  font-style:normal;
+  display:block;
+  color:var(--sea);
+}
+.hero__lede{
+  font-size:clamp(1.15rem,1.9vw,1.5rem);
+  max-width:31ch;
+  color:var(--ink);
+  margin:0;
+}
+.hero__lede b{font-weight:600;}
+
+.hero__bottom{
+  padding-bottom:clamp(28px,5vh,54px);
+  padding-top:20px;
+  color:var(--phase);
+}
+.hero__status{
+  font-family:var(--mono);
+  font-size:.76rem;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:rgba(238,242,242,.7);
+  margin:0 0 18px;
+  max-width:34ch;
+}
+.hero__status b{color:var(--amber);font-weight:500;}
+.cta{display:flex;gap:14px;flex-wrap:wrap;}
+.cta a{
+  font-family:var(--mono);
+  font-size:.8rem;
+  letter-spacing:.06em;
+  text-decoration:none;
+  padding:11px 20px;
+  border:1px solid var(--hair-ink);
+  border-radius:999px;
+  color:var(--phase);
+  transition:border-color .25s, color .25s, background .25s;
+}
+.cta a:hover{border-color:var(--amber);color:var(--amber);}
+.cta a.is-solid{background:var(--amber);border-color:var(--amber);color:var(--ink);}
+.cta a.is-solid:hover{background:transparent;color:var(--amber);}
+
+/* live readout, sits on the interface line */
+.readout{
+  position:absolute;
+  left:var(--pad);
+  z-index:3;
+  font-family:var(--mono);
+  font-size:.74rem;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:var(--sea);
+  display:flex;align-items:center;gap:10px;
+  transition:opacity .45s ease;
+}
+.readout::before{
+  content:"";width:26px;height:1px;background:var(--sea);
+}
+
+/* ============================================================
+   BANDS
+   ============================================================ */
+.band{padding:clamp(78px,11vw,150px) var(--pad);}
+.band--ink{background:var(--ink);color:var(--phase);}
+.band--paper{background:var(--paper);}
+.band--tight{padding-top:clamp(46px,6vw,80px);}
+
+.band h2{
+  font-family:var(--display);
+  font-variation-settings:"wdth" 104;
+  font-weight:600;
+  font-size:clamp(1.9rem,4vw,3.1rem);
+  line-height:1.05;
+  letter-spacing:-.02em;
+  margin:0 0 44px;
+}
+
+/* ---- About ---- */
+.about{
+  display:grid;
+  grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);
+  gap:clamp(40px,7vw,110px);
+  align-items:start;
+}
+.about p{font-size:clamp(1.1rem,1.5vw,1.32rem);margin:0 0 22px;max-width:62ch;}
+.about p:last-child{margin-bottom:0;}
+.about .drop::first-letter{
+  font-family:var(--display);
+  font-size:3.1em;
+  float:left;
+  line-height:.82;
+  padding:.06em .12em 0 0;
+  font-weight:600;
+  color:var(--sea);
+}
+
+.facts{
+  font-family:var(--mono);
+  font-size:.82rem;
+  line-height:1.6;
+  border-top:1px solid var(--hair);
+  margin:8px 0 0;
+}
+.facts div{
+  display:grid;
+  grid-template-columns:minmax(0,88px) minmax(0,1fr);
+  gap:16px;
+  padding:13px 0;
+  border-bottom:1px solid var(--hair);
+}
+.facts dt{color:var(--sea);letter-spacing:.08em;text-transform:uppercase;font-size:.7rem;padding-top:2px;}
+.facts dd{margin:0;color:var(--ink);}
+
+/* ---- Research ---- */
+.themes{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr));
+  gap:clamp(28px,4vw,52px);
+}
+.theme{border-top:2px solid var(--hair-ink);padding-top:22px;}
+.theme--a{border-top-color:var(--amber);}
+.theme--b{border-top-color:var(--sea);}
+.theme--c{border-top-color:rgba(238,242,242,.4);}
+.theme__tag{
+  font-family:var(--mono);
+  font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;
+  color:rgba(238,242,242,.55);
+  margin:0 0 14px;
+}
+.theme h3{
+  font-family:var(--display);
+  font-variation-settings:"wdth" 100;
+  font-weight:600;
+  font-size:1.32rem;
+  letter-spacing:-.01em;
+  margin:0 0 14px;
+}
+.theme p{margin:0;color:rgba(238,242,242,.8);font-size:1.02rem;}
+.theme .note{
+  display:block;margin-top:16px;
+  font-family:var(--mono);font-size:.74rem;letter-spacing:.04em;
+  color:var(--amber);
+}
+
+.methods{
+  margin-top:clamp(48px,6vw,80px);
+  padding-top:26px;
+  border-top:1px solid var(--hair-ink);
+  display:flex;flex-wrap:wrap;gap:10px;
+}
+.methods span{
+  font-family:var(--mono);font-size:.75rem;letter-spacing:.04em;
+  padding:7px 14px;border:1px solid var(--hair-ink);border-radius:999px;
+  color:rgba(238,242,242,.78);
+}
+
+/* ---- Publications ---- */
+.pubs{border-top:1px solid var(--hair);}
+.pub{
+  display:grid;
+  grid-template-columns:minmax(0,84px) minmax(0,1fr) 26px;
+  gap:clamp(16px,3vw,40px);
+  align-items:start;
+  padding:30px 0;
+  border-bottom:1px solid var(--hair);
+  text-decoration:none;
+  transition:background .25s ease, padding-left .25s ease;
+}
+.pub:hover{background:rgba(46,154,168,.055);padding-left:14px;}
+.pub__year{
+  font-family:var(--mono);font-size:.8rem;letter-spacing:.06em;
+  color:var(--sea);padding-top:5px;
+}
+.pub__title{
+  font-family:var(--display);
+  font-variation-settings:"wdth" 100;
+  font-weight:500;
+  font-size:clamp(1.08rem,1.7vw,1.4rem);
+  line-height:1.32;
+  letter-spacing:-.01em;
+  margin:0 0 8px;
+}
+.pub__meta{margin:0;color:var(--slate);font-size:.99rem;}
+.pub__meta b{color:var(--ink);font-weight:600;}
+.pub__meta i{font-style:italic;}
+.pub__go{
+  font-family:var(--mono);color:var(--hair);padding-top:6px;
+  transition:color .25s ease, transform .25s ease;
+}
+.pub:hover .pub__go{color:var(--amber);transform:translateX(4px);}
+
+/* ---- Figures ---- */
+.figs{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:clamp(26px,4vw,54px);
+}
+.fig--wide{grid-column:1 / -1;}
+figure{margin:0;}
+figure img{
+  width:100%;
+  border:1px solid var(--hair);
+  border-radius:3px;
+  background:var(--paper);
+}
+figcaption{
+  margin-top:14px;
+  font-family:var(--mono);
+  font-size:.76rem;
+  line-height:1.55;
+  color:var(--slate);
+  letter-spacing:.02em;
+}
+figcaption b{color:var(--sea);font-weight:500;letter-spacing:.1em;}
+
+/* ---- Contact ---- */
+.contact__mail{
+  font-family:var(--display);
+  font-variation-settings:"wdth" 100;
+  font-weight:500;
+  font-size:clamp(1.5rem,4.6vw,3.4rem);
+  letter-spacing:-.02em;
+  text-decoration:none;
+  color:var(--phase);
+  border-bottom:2px solid rgba(238,242,242,.25);
+  transition:color .25s, border-color .25s;
+  word-break:break-word;
+  display:inline-block;
+}
+.contact__mail:hover{color:var(--amber);border-color:var(--amber);}
+.contact__links{
+  margin-top:44px;
+  display:flex;flex-wrap:wrap;gap:12px 28px;
+  font-family:var(--mono);font-size:.82rem;letter-spacing:.05em;
+}
+.contact__links a{color:rgba(238,242,242,.75);text-decoration:none;border-bottom:1px solid var(--hair-ink);padding-bottom:3px;transition:color .25s,border-color .25s;}
+.contact__links a:hover{color:var(--amber);border-color:var(--amber);}
+.contact__note{
+  font-family:var(--mono);font-size:.76rem;letter-spacing:.1em;text-transform:uppercase;
+  color:rgba(238,242,242,.5);margin:0 0 32px;
+}
+
+footer{
+  padding:34px var(--pad);
+  background:var(--ink);
+  color:rgba(238,242,242,.42);
+  font-family:var(--mono);
+  font-size:.73rem;
+  letter-spacing:.06em;
+  display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
+  border-top:1px solid var(--hair-ink);
+}
+
+/* ---- reveal ---- */
+.reveal{opacity:0;transform:translateY(16px);}
+.reveal.is-in{opacity:1;transform:none;transition:opacity .8s ease, transform .8s cubic-bezier(.2,.7,.2,1);}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width:900px){
+  .about{grid-template-columns:1fr;}
+  .figs{grid-template-columns:1fr;}
+  .fig--wide{grid-column:auto;}
+  .nav__links{display:none;}
+  .hero__lede{max-width:22ch;}
+  .hero__top{padding-bottom:clamp(150px,30vh,240px);}
+}
+
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto;}
+  .reveal{opacity:1;transform:none;}
+  *{transition-duration:.01ms !important;}
+}
+</style>
+</head>
+
+<body>
+
+<nav class="nav" id="nav">
+  <div class="nav__mark">R<span>·</span>M</div>
+  <div class="nav__links">
+    <a href="#about">About</a>
+    <a href="#research">Research</a>
+    <a href="#publications">Publications</a>
+    <a href="#figures">Figures</a>
+    <a href="#contact">Contact</a>
+  </div>
+</nav>
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <canvas id="field" aria-hidden="true"></canvas>
+
+  <div class="hero__top">
+    <div class="hero__inner">
+      <p class="eyebrow">Low-Reynolds-number hydrodynamics · IIT Jammu</p>
+      <h1>Rishish<em>Mishra</em></h1>
+      <p class="hero__lede">I study what happens when a swimmer the size of a bacterium meets the <b>boundary between two fluids</b>.</p>
+    </div>
+  </div>
+
+  <div class="readout" id="readout">β = +1 — crossing</div>
+
+  <div class="hero__bottom">
+    <div class="hero__inner">
+      <p class="hero__status">PhD awarded June 2026 · <b>Available for postdoctoral positions</b></p>
+      <div class="cta">
+        <a href="#research" class="is-solid">See the research</a>
+        <a href="mailto:rishish3mishra@gmail.com">Get in touch</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ============ ABOUT ============ -->
+<section class="band band--paper" id="about">
+  <div class="wrap about reveal">
+    <div>
+      <p class="eyebrow">About</p>
+      <p class="drop">A microswimmer that reaches an oil–water interface has three futures: it passes through, it sticks, or it turns away. Which one it gets is decided in a few body lengths, by a competition between the flow the swimmer generates and the surface tension holding the boundary together.</p>
+      <p>My PhD, completed in the Department of Mechanical Engineering at IIT Jammu in June 2026, is about pinning that competition down. I run lattice Boltzmann simulations of squirmers in a Cahn–Hilliard diffuse-interface framework, on HPC clusters, and map the outcomes onto phase diagrams in dipole strength and capillary number.</p>
+      <p>Before the microswimmer work I studied conjugate heat transfer in machining and built automated rooftop harvesting systems — which is why I am as comfortable with a commercial CFD solver and a sensor rig as with a lattice code.</p>
+    </div>
+
+    <dl class="facts">
+      <div><dt>Degree</dt><dd>PhD, Mechanical Engineering, IIT Jammu (2026)</dd></div>
+      <div><dt>Thesis</dt><dd>Hydrodynamics of Microswimmers near the Fluid–Fluid Interface</dd></div>
+      <div><dt>Methods</dt><dd>Lattice Boltzmann · diffuse-interface (Cahn–Hilliard) · squirmer model</dd></div>
+      <div><dt>Output</dt><dd>4 peer-reviewed papers · 5 international conferences</dd></div>
+      <div><dt>Teaching</dt><dd>TA: numerical methods, thermodynamics, thermal &amp; fluids lab</dd></div>
+      <div><dt>Based in</dt><dd>India · open to relocation</dd></div>
+    </dl>
+  </div>
+</section>
+
+<!-- ============ RESEARCH ============ -->
+<section class="band band--ink" id="research">
+  <div class="wrap reveal">
+    <p class="eyebrow">Research</p>
+    <h2>Three questions the<br>interface keeps asking</h2>
+
+    <div class="themes">
+      <article class="theme theme--a">
+        <p class="theme__tag">Crossing</p>
+        <h3>Why some swimmers get through</h3>
+        <p>Interface crossing of prolate swimmers, separated into its thermodynamic and hydrodynamic parts. At the same swimming speed, the strength of the swimmer's force dipole decides the outcome.</p>
+        <span class="note">β = +1 escapes · β = +2 does not</span>
+      </article>
+
+      <article class="theme theme--b">
+        <p class="theme__tag">Trapping</p>
+        <h3>How a trapped swimmer sits</h3>
+        <p>The flow structure around a swimmer held at the boundary, and the orientation it settles into: pullers stabilise perpendicular to the interface, pushers lie parallel to it.</p>
+        <span class="note">Deformation sets the escape route</span>
+      </article>
+
+      <article class="theme theme--c">
+        <p class="theme__tag">Contrast · in progress</p>
+        <h3>When the two fluids are unequal</h3>
+        <p>Most of the picture above assumes matched viscosities. I am now sweeping viscosity ratio against dipole strength and capillary number to see how the trapped and crossing states survive a real contrast.</p>
+        <span class="note">β × λ × Ca</span>
+      </article>
+    </div>
+
+    <div class="methods">
+      <span>Lattice Boltzmann</span>
+      <span>Ludwig</span>
+      <span>Cahn–Hilliard</span>
+      <span>Squirmer model</span>
+      <span>ANSYS Fluent</span>
+      <span>Python</span>
+      <span>MATLAB</span>
+      <span>HPC campaigns</span>
+      <span>LaTeX · TikZ</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PUBLICATIONS ============ -->
+<section class="band" id="publications">
+  <div class="wrap reveal">
+    <p class="eyebrow">Peer-reviewed</p>
+    <h2>Publications</h2>
+
+    <div class="pubs">
+
+      <a class="pub" href="https://journals.aps.org/prfluids/abstract/10.1103/vrqb-nf6x" target="_blank" rel="noopener">
+        <span class="pub__year">2026</span>
+        <span>
+          <span class="pub__title">Interface crossing behavior of prolate microswimmers: thermo and hydrodynamics</span>
+          <p class="pub__meta"><b>R. Mishra</b>, H. Pothukuchi, H. Gidituri, J. Lintuvuori · <i>Physical Review Fluids</i> 11(1), 014002</p>
+        </span>
+        <span class="pub__go">↗</span>
+      </a>
+
+      <a class="pub" href="https://iopscience.iop.org/article/10.1088/1873-7005/ad6804/meta" target="_blank" rel="noopener">
+        <span class="pub__year">2024</span>
+        <span>
+          <span class="pub__title">Flow structure around a microswimmer at fluid–fluid interface</span>
+          <p class="pub__meta"><b>R. Mishra</b>, M. Gosika, H. Gidituri, H. Pothukuchi · <i>Fluid Dynamics Research</i> 56(4), 045507</p>
+        </span>
+        <span class="pub__go">↗</span>
+      </a>
+
+      <a class="pub" href="https://journals.sagepub.com/doi/full/10.1177/09544089221125633" target="_blank" rel="noopener">
+        <span class="pub__year">2022</span>
+        <span>
+          <span class="pub__title">A novel conjugate heat transfer approach to determine the temperature distribution in a single-point cutting tool</span>
+          <p class="pub__meta"><b>R. Mishra</b>, V. Dubey, R. K. Singh, A. K. Sharma, J. K. Katiyar · <i>Proc. IMechE Part E: J. Process Mechanical Engineering</i></p>
+        </span>
+        <span class="pub__go">↗</span>
+      </a>
+
+      <a class="pub" href="https://www.sciencedirect.com/science/article/pii/S2214785321004880" target="_blank" rel="noopener">
+        <span class="pub__year">2021</span>
+        <span>
+          <span class="pub__title">Understanding soilless engineered soil as a sustainable growing material for food production in a green roof</span>
+          <p class="pub__meta">K. Shukla, <b>R. Mishra</b>, P. Sarkar · <i>Materials Today: Proceedings</i> 43, 3054–3060</p>
+        </span>
+        <span class="pub__go">↗</span>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============ FIGURES ============ -->
+<section class="band band--paper band--tight" id="figures">
+  <div class="wrap reveal">
+    <p class="eyebrow">From the simulations</p>
+    <h2>Figures</h2>
+
+    <div class="figs">
+      <figure>
+        <img src="Pus_bulk.PNG" alt="Hydrodynamic forcing around a pusher swimming in the bulk fluid" loading="lazy">
+        <figcaption><b>FIG. 01</b><br>Hydrodynamic forcing around a pusher in the bulk, before any boundary is felt.</figcaption>
+      </figure>
+
+      <figure>
+        <img src="1.png" alt="Swimmer velocity and orientation as it approaches the interface" loading="lazy">
+        <figcaption><b>FIG. 02</b><br>Velocity and orientation of a swimmer approaching the interface.</figcaption>
+      </figure>
+
+      <figure class="fig--wide">
+        <img src="Snapshots.png" alt="Simulation snapshots of a swimmer crossing, trapping and bouncing at the interface" loading="lazy">
+        <figcaption><b>FIG. 03</b><br>Simulation snapshots across the parameter space: the same swimmer crosses, traps or turns away depending on dipole strength and capillary number.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CONTACT ============ -->
+<section class="band band--ink" id="contact">
+  <div class="wrap reveal">
+    <p class="eyebrow">Contact</p>
+    <p class="contact__note">Happy to talk about postdocs, collaborations, or anything at low Reynolds number</p>
+    <a class="contact__mail" href="mailto:rishish3mishra@gmail.com">rishish3mishra@gmail.com</a>
+    <div class="contact__links">
+      <a href="https://scholar.google.com/citations?hl=en&amp;user=iqj0ycUAAAAJ" target="_blank" rel="noopener">Google Scholar</a>
+      <a href="https://www.linkedin.com/in/rishish-mishra-47236a191/" target="_blank" rel="noopener">LinkedIn</a>
+      <!-- Drop cv.pdf next to this file and this link works as-is -->
+      <a href="cv.pdf" target="_blank" rel="noopener">Curriculum vitae (PDF)</a>
+      <!-- Optional: add your ORCID
+      <a href="https://orcid.org/0000-0000-0000-0000" target="_blank" rel="noopener">ORCID</a> -->
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>© 2026 Rishish Mishra</span>
+  <span>Jammu · Varanasi · anywhere with a cluster</span>
+</footer>
+
+<script>
+/* ------------------------------------------------------------
+   The hero field.
+   An interface at rest, a swimmer coming up from the lower
+   phase, and three outcomes on a loop: crossing, trapping,
+   bouncing. The interface deforms in response to the swimmer,
+   which is the whole point of the thesis.
+   ------------------------------------------------------------ */
+(function () {
+  var canvas = document.getElementById('field');
+  var readout = document.getElementById('readout');
+  if (!canvas || !canvas.getContext) return;
+
+  var ctx = canvas.getContext('2d');
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var css = getComputedStyle(document.documentElement);
+  var INK   = css.getPropertyValue('--ink').trim()   || '#0A1C24';
+  var SEA   = css.getPropertyValue('--sea').trim()   || '#2E9AA8';
+  var AMBER = css.getPropertyValue('--amber').trim() || '#E0A03A';
+
+  var W = 0, H = 0, restY = 0, sx = 0, R = 13;
+
+  var states = [
+    { label: 'β = +1 — crossing', mode: 'cross',  dur: 6400 },
+    { label: 'β = +2 — trapped',  mode: 'trap',   dur: 7600 },
+    { label: 'β = −1 — bouncing', mode: 'bounce', dur: 6400 }
+  ];
+  var idx = 0, t0 = 0;
+
+  function size() {
+    var r = canvas.getBoundingClientRect();
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = r.width; H = r.height;
+    canvas.width  = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    restY = H * 0.60;
+    sx = W > 760 ? W * 0.76 : W * 0.72;
+    R = W > 760 ? 14 : 11;
+    if (readout) readout.style.top = (restY - 42) + 'px';
+  }
+
+  function easeInOut(t) { return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; }
+
+  /* where the swimmer is, given the state and its progress */
+  function swimmerY(mode, p) {
+    var start = restY + H * 0.30 + 60;
+    if (mode === 'cross') {
+      return start + (restY - H * 0.34 - start) * easeInOut(p);
+    }
+    if (mode === 'trap') {
+      var q = Math.min(1, p / 0.55);
+      return start + ((restY + R) - start) * easeInOut(q);
+    }
+    // bounce: comes close, turns away
+    var turn = restY + R + 46;
+    return start + (turn - start) * Math.sin(Math.PI * p);
+  }
+
+  /* interface height at x, deformed by the nearby swimmer */
+  function interfaceY(x, sy) {
+    var gap = sy - restY;                       // >0 : swimmer below
+    var near = Math.exp(-Math.pow(gap / 70, 2));
+    var amp = 34 * near;
+    var dir = gap > 0 ? -1 : 1;                 // pushed away from the swimmer
+    var bell = Math.exp(-Math.pow((x - sx) / 118, 2));
+    return restY + dir * amp * bell;
+  }
+
+  function lattice(sy) {
+    var step = W > 760 ? 34 : 26;
+    for (var x = step / 2; x < W; x += step) {
+      for (var y = step / 2; y < H; y += step) {
+        var iy = interfaceY(x, sy);
+        ctx.fillStyle = y > iy ? 'rgba(238,242,242,.10)' : 'rgba(10,28,36,.13)';
+        ctx.beginPath();
+        ctx.arc(x, y, 1, 0, 6.2832);
+        ctx.fill();
+      }
+    }
+  }
+
+  function draw(sy) {
+    ctx.clearRect(0, 0, W, H);
+
+    /* lower phase */
+    ctx.beginPath();
+    ctx.moveTo(0, interfaceY(0, sy));
+    for (var x = 0; x <= W; x += 6) ctx.lineTo(x, interfaceY(x, sy));
+    ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.closePath();
+    ctx.fillStyle = INK;
+    ctx.fill();
+
+    lattice(sy);
+
+    /* the interface itself */
+    ctx.beginPath();
+    ctx.moveTo(0, interfaceY(0, sy));
+    for (var x2 = 0; x2 <= W; x2 += 4) ctx.lineTo(x2, interfaceY(x2, sy));
+    ctx.strokeStyle = SEA;
+    ctx.lineWidth = 1.6;
+    ctx.globalAlpha = .95;
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+
+    /* the swimmer, drawn prolate and pointing where it swims */
+    ctx.save();
+    ctx.translate(sx, sy);
+    ctx.beginPath();
+    ctx.ellipse(0, 0, R * 0.72, R * 1.18, 0, 0, 6.2832);
+    ctx.fillStyle = AMBER;
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(0, -R * 1.18);
+    ctx.lineTo(0, -R * 2.5);
+    ctx.strokeStyle = AMBER;
+    ctx.lineWidth = 1.4;
+    ctx.globalAlpha = .55;
+    ctx.stroke();
+    ctx.restore();
+    ctx.globalAlpha = 1;
+  }
+
+  function frame(now) {
+    if (!t0) t0 = now;
+    var s = states[idx];
+    var p = (now - t0) / s.dur;
+
+    if (p >= 1) {
+      t0 = now; p = 0;
+      idx = (idx + 1) % states.length;
+      s = states[idx];
+      if (readout) {
+        readout.style.opacity = 0;
+        setTimeout(function () {
+          readout.textContent = states[idx].label;
+          readout.style.opacity = 1;
+        }, 260);
+      }
+    }
+    draw(swimmerY(s.mode, p));
+    requestAnimationFrame(frame);
+  }
+
+  size();
+  window.addEventListener('resize', size);
+
+  if (reduce) {
+    if (readout) readout.textContent = states[1].label;
+    draw(restY + R);                       // a single, still, trapped swimmer
+  } else {
+    if (readout) readout.textContent = states[0].label;
+    requestAnimationFrame(frame);
+  }
+})();
+
+/* nav hairline on scroll */
+(function () {
+  var nav = document.getElementById('nav');
+  var onScroll = function () { nav.classList.toggle('is-stuck', window.scrollY > 12); };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+})();
+
+/* section reveal */
+(function () {
+  var items = document.querySelectorAll('.reveal');
+  if (!('IntersectionObserver' in window) ||
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    items.forEach(function (el) { el.classList.add('is-in'); });
+    return;
+  }
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); }
+    });
+  }, { threshold: 0.12 });
+  items.forEach(function (el) { io.observe(el); });
+})();
+</script>
+
+</body>
+</html>
